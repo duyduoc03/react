@@ -1,7 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect} from 'react'
 
 function Home () {
     const [count, setCount] = useState(0)
+    useEffect({
+
+        count
+        
+    },[])
+    
 
     return (
         <main>
