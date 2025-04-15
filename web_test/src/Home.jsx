@@ -1,24 +1,35 @@
 import { useState, useEffect} from 'react'
 
 function Home () {
-    const [count, setCount] = useState(0)
-    useEffect({
+    const [count, setCount] = useState(0);
 
-        count
+    useEffect(() => {
+
+        document.title = 'Count: ' + count;
         
-    },[])
-    
+    },[count])
+
+    function increase(){
+        setCount((c) => c + 1);
+    }
+
+    function discount(){
+        setCount((c) => c - 1);
+    }
 
     return (
         <main>
             <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>
+                <button onClick={increase}>
+                count is {count}
+                </button>
+                <button onClick={discount}>
                 count is {count}
                 </button>
             </div>
             <div className='row'>
                 <div className='col-6'>
-                    asfjagfhng fghrwa bwreui hg
+                    hello world
                 </div>
             </div>
         </main>
