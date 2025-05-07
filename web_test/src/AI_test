@@ -1,0 +1,114 @@
+calculateBuyTogether: function() {
+    var total = 0;
+    $('[name="buy_together"]:checked').each(function() {
+        let element = $(this).closest('[item-buy-together]');
+        let quantity = nhMain.utilities.parseInt($('[nh-quantity-product="quantity"]', element).val());
+        let price = nhMain.utilities.parseInt($(this).attr('data-price'));
+        total += price * quantity;
+    })
+
+    $('[total-buy-together]').text(nhMain.utilities.parseNumberToTextMoney(total));
+},
+
+calculateAddToCart: function(btnAddCart, callback = null) {
+    var self = this;
+    var wrapElement = btnAddCart.closest('[nh-product]');
+    if(wrapElement == _UNDEFINED || wrapElement.length == 0){
+        nhMain.showLog(nhMain.getLabel('khong_tim_thay_the_bao_ngoai_san_pham') + ' [nh-product]');
+        return false;
+    };
+
+    var productItem = [];
+    var productQuantity = [];
+    var total = 0;
+
+    $('[name="buy_together"]:checked').each(function() {
+        let element = $(this).closest('[item-buy-together]');
+        let quantity = nhMain.utilities.parseInt($('[nh-quantity-product="quantity"]', element).val());
+        let price = nhMain.utilities.parseInt(element.attr('data-price'));
+        productItem.push($(this).val());
+        productQuantity.push(quantity);
+        total += price * quantity;
+    })
+
+    $('[total-buy-together]').text(nhMain.utilities.parseNumberToTextMoney(total));
+    
+    if (typeof(callback) != 'function') {
+        callback = function () {};
+    }
+
+    if(productItem.length == 0 || !productQuantity.length > 0){
+        nhMain.showLog(nhMain.getLabel('du_lieu_khong_hop_le'));
+        return false;
+    }
+
+    nhMain.callAjax({
+        async: true,
+        url: '/cart/add-multi-product',
+        data: {
+            product_item_id: productItem,
+            quantity: productQuantity
+        },
+    }).done(function(response) {
+        callback(response);
+    });
+},
+
+addMultiProductToCart: function(productItemId = null, quantity = 1, callback = null){
+    var self = this;
+
+    if (typeof(callback) != 'function') {
+        callback = function () {};
+    }
+
+    if(productItemId.length == 0 || !quantity > 0){
+        nhMain.showLog(nhMain.getLabel('du_lieu_khong_hop_le'));
+        return false;
+    }
+
+    nhMain.callAjax({
+        async: true,
+        url: '/cart/add-multi-product',
+        data: {
+            product_item_id: productItemId,
+            quantity: quantity
+        },
+    }).done(function(response) {
+        callback(response);
+    });
+},
+
+addProductToCart: function(productItemId = null, quantity = 1, callback = null){
+    var self = this;
+
+    if (typeof(callback) != 'function') {
+        callback = function () {};
+    }
+
+    if(!productItemId > 0 || !quantity > 0){
+        nhMain.showLog(nhMain.getLabel('du_lieu_khong_hop_le'));
+        return false;
+    }
+
+    nhMain.callAjax({
+        async: true,
+        url: '/cart/add-product',
+        data: {
+            product_item_id: productItemId,
+            quantity: quantity
+        },
+    }).done(function(response) {
+        var code = typeof(response.code) != _UNDEFINED ? response.code : _ERROR;
+        var message = typeof(response.message) != _UNDEFINED ? response.message : '';
+
+        if (code == _ERROR){
+            nhMain.showAlert(_ERROR, message);
+        }
+
+        if (code == _SUCCESS && typeof(nhOrder.sidebar) != _UNDEFINED) {
+            callback(response);             
+        }
+
+        
+    });
+},
